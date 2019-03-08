@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -49,7 +50,12 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+
+
         $data = $request->all();
+
+        $image = Storage::disk('public')->put('categories_images', $data['image_file']);
+        $data['image'] = $image;
         $data['slug'] = Str::slug($data['name']);
         $newCategory = new Category;
         $newCategory->fill($data);
@@ -97,6 +103,10 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $data = $request->all();
+
+        $image = Storage::disk('public')->put('categories_images', $data['image_file']);
+
+        $data['image'] = $image;
         $data['slug'] = Str::slug($data['name']);
 
         $category->update($data);
