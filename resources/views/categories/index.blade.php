@@ -5,8 +5,10 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                    <td><a href=" {{ route('categories.create') }}" class="btn btn-success">Create</a></td>
+                    @if (Auth::user()->can('modificare'))
 
+                    <td><a href=" {{ route('categories.create') }}" class="btn btn-success">Create</a></td>
+                    @endif
                 <table class="table">
                     <thead>
                       <tr>
@@ -19,19 +21,25 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                          @foreach ($categories as $category)
+                        @foreach ($categories as $category)
+                          <tr>
                             <td>{{ $category->id}}</td>
                             <td>{{ $category->name}}</td>
                             <td>{{ $category->slug}}</td>
+
+
                             <td><a href=" {{ route('categories.show', $category->id) }}" class="btn btn-success">Show</a></td>
+                            @if (Auth::user()->can('modificare'))
                             <td><a href=" {{ route('categories.edit', $category->id) }}" class="btn btn-success">Edit</a></td>
                             <td><form action="{{ route('categories.destroy', $category->id) }}" method="post">
-                                <button type="submit" class="btn btn-delete">Delete</button>
-                            </form>
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-delete">Delete</button>
+                                </form>
                             </td>
+                            @endif
+                        </tr>
                           @endforeach
-                      </tr>
                     </tbody>
                   </table>
             </div>

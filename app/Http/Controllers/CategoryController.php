@@ -4,9 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:modificare')->except(['index', 'show']);
+        $this->middleware('permission:vedere');
+
+    }
     /**
      * Display a listing of the resource.
      *
@@ -25,7 +32,13 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        $data = [
+            'h1'=> 'Crea Nuova Categoria',
+            'action'=> route('categories.store'),
+            'method'=> 'POST',
+        ];
+
+        return view('categories.create_edit', $data);
     }
 
     /**
@@ -36,7 +49,13 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->all();
+        $data['slug'] = Str::slug($data['name']);
+        $newCategory = new Category;
+        $newCategory->fill($data);
+        $newCategory->save();
+
+        return redirect()->route('categories.index');
     }
 
     /**
@@ -47,7 +66,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        return view('categories.show', compact('category'));
     }
 
     /**
@@ -58,7 +77,14 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        $data = [
+            'h1'=> 'Edita la categoria: ' . $category->name,
+            'action'=> route('categories.update', $category->id),
+            'method'=> 'PUT',
+            'category'=> $category,
+        ];
+
+        return view('categories.create_edit', $data);
     }
 
     /**
@@ -70,7 +96,12 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $data = $request->all();
+        $data['slug'] = Str::slug($data['name']);
+
+        $category->update($data);
+        return redirect()->route('categories.index');
+
     }
 
     /**
@@ -81,6 +112,8 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return redirect()->route('categories.index');
+
     }
 }
